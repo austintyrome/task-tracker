@@ -11,15 +11,11 @@ lane.css('z-index', '-1');
 
 // Todo: create a function to generate a unique task id
 function generateTaskId() {
-
-  let tasks = JSON.parse(localStorage.getItem('tasks'));
-
-  return tasks;
-}
-
-
-function saveTaskstoStorage(tasks) {
-  localStorage.setItem('tasks', JSON.stringify(taskList));
+  let currentId = JSON.parse(localStorage.getItem("currentId"));
+  if (!currentId) {currentId = 0} 
+  currentId++;
+  localStorage.setItem('currentId', currentId);
+  return currentId;
 }
 
 // Todo: create a function to create a task card
