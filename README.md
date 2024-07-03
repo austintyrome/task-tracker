@@ -34,8 +34,11 @@ THEN the saved tasks persist
 
 ## Author
 * **Austin Godfrey** - [austintyrome](https://github.com/austintyrome)
+
 ##License
+```
 This repository is under the MIT licesne.
+```
 ##GitHub
 ```
 https://github.com/austintyrome/task-tracker
