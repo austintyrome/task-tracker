@@ -1,14 +1,13 @@
 // Retrieve tasks and nextId from localStorage
-let taskList = JSON.parse(localStorage.getItem("tasks"));
-let nextId = JSON.parse(localStorage.getItem("nextId"));
-const dialog = document.getElementById("#addTasks");
-const taskNameInput = document.getElementById("#task-name");
-const dueDateInput = document.getElementById("#due-date");
-const taskDiscriptionInput = document.getElementById("#task-information");
-
-function showTaskInput() {
-  dialog.showModal()
-}
+const todoList= $('#todo-cards');
+const inProgressList = $('#in-progress-cards');
+const doneList = $('#done-cards');
+const taskTitleInput = $("#taskTitle");
+const dueDateInput =$("#dueDate");
+const taskDescriptionInput = $("#taskDescription");
+const deleteBtn = $('.deleteBtn');
+const lane = $('.tripleList');
+lane.css('z-index', '-1');
 
 // Todo: create a function to generate a unique task id
 function generateTaskId() {
