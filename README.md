@@ -32,10 +32,11 @@ WHEN I refresh the page
 THEN the saved tasks persist
 ```
 
-
-* The URL of the deployed application
-
-* The URL of the GitHub repository, with a unique name and a README describing the project
-
-- - -
-© 2024 edX Boot Camps LLC. Confidential and Proprietary. All Rights Reserved.
+## Author
+* **Austin Godfrey** - [austintyrome](https://github.com/austintyrome)
+##License
+This repository is under the MIT licesne.
+##GitHub
+```
+https://github.com/austintyrome/task-tracker
+```
