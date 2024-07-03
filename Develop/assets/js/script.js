@@ -24,86 +24,95 @@ function saveTaskstoStorage(tasks) {
 }
 
 // Todo: create a function to create a task card
-function createTaskCard(tasks) {
-  const taskCard = $('<div>')
-  .addClass('card task-card draggable my-3')
-  .attr('data-project-id', task.id);
-const cardHeader = $('<div>').addClass('card-header h4').text(task.name);
-const cardBody = $('<div>').addClass('card-body');
-const cardDescription = $('<p>').addClass('card-text').text(task.discription);
-const cardDueDate = $('<p>').addClass('card-text').text(task.dueDate);
-const cardDeleteBtn = $('<button>')
-  .addClass('btn btn-danger delete')
-  .text('Delete')
-  .attr('data-project-id', task.id);
-cardDeleteBtn.on('click', handleDeleteTask);
+function createTaskCard(task) {
+
+  const newCard = $('<li>').css('width', '18rem').css('z-index', '50').attr('data-taskId', task.id).addClass("taskCard");
+  const newCardBody = $('<div>').addClass("card-body draggable").attr('data-taskId', task.id).css('border', 'solid black 1px');
+  const newTaskName = $('<h5>').addClass("card-title").text(task.title);
+  const newDueDateField = $('<p>').addClass("card-text").text("Due on " + task.dueDate);
+  const newStatus = $('<p>').addClass("card-text cardStatusText").text("Status: " + task.status);
+  const newDescription = $('<p>').addClass("card-text").text(task.description);
+  const newDeleteButton = $('<button>').addClass("btn btn-danger custom-delete-btn deleteBtn").text('delete').attr('data-taskId', task.id);
+
+  if (task.dueDate && task.status !== 'done') {
+    const today = dayjs();
+    const dueDate = dayjs(task.dueDate, 'DD/MM/YYYY');
+    if (today.isSame(dueDate, 'day')) {
+      newCard.addClass('bg-warning text-white card draggable');
+    } else if (today.isAfter(dueDate)) {
+      newCard.addClass('bg-danger text-white card draggable');
+    } else {newCard.addClass('card bg-info draggable')}
+    
+} else {newCard.addClass('card bg-success draggable')}
+
+newCardBody.append(newTaskName, $('<hr>'), newDueDateField, newStatus, newDescription, newDeleteButton);
+newCard.append(newCardBody);
+
+
+return newCard;
 }
 
 // Todo: create a function to render the task list and make cards draggable
 function renderTaskList() {
-  const tasks = readTasksFromStorage();
-
-  const todoList = $('#todo-cards');
   todoList.empty();
-
-  const inProgressList = $('#in-progress-cards');
   inProgressList.empty();
-
-  const doneList = $('#done-cards');
   doneList.empty();
-
   
-  for (let task of tasks) {
-    if (task.status === 'to-do') {
-      todoList.append(createTaskCard(task));
-    } else if (task.status === 'in-progress') {
-      inProgressList.append(createTaskCard(task));
-    } else if (task.status === 'done') {
-      doneList.append(createTaskCard(task));
-    }
-  }
-
-  
-  $('.draggable').draggable({
-    opacity: 0.7,
-    zIndex: 100,
-    
-    helper: function (e) {
-    
-      const original = $(e.target).hasClass('ui-draggable')
-        ? $(e.target)
-        : $(e.target).closest('.ui-draggable');
-      
-      return original.clone().css({
-        width: original.outerWidth(),
+  $(function() {
+      $(".taskCard").draggable({
+          cancel: ".deleteBtn",
+          revert: "invalid",
       });
-    },
   });
+  
+  let tasks = JSON.parse(localStorage.getItem('tasks'))
+  if (!tasks) {tasks = []}
+  for (let task of tasks) {
+      if (task.status == "notStarted"){
+          todoList.append(createTaskCard(task));
+      } else if (task.status == "inProgress"){
+          inProgressList.append(createTaskCard(task));
+      } else if (task.status == "done"){
+          
+          doneList.append(createTaskCard(task));
+      }
+      
+  }
 }
 
 // Todo: create a function to handle adding a new task
 function handleAddTask(event) {
   event.preventDefault();
 
-  
-  const taskName = taskNameInput.val().trim();
-  const taskDiscription = taskDiscriptionInput.val().trim();
-  const dueDate = dueDateInput.val();
+  if (taskTitleInput.val()==null || dueDateInput.val()==null || taskDescriptionInput.val()==null){
+    alert('Please fill out all fields.');
+    return;
+} else {
 
-  const newTask = {
-    
-    name: taskName,
-    Discription: taskDiscription,
-    dueDate: dueDate,
-    status: 'to-do',
-  }
-  const task = readTasksfromStorage();
-  task.push(newTask);
+let taskList = JSON.parse(localStorage.getItem("tasks"));
+const taskTitle = taskTitleInput.val();
+const taskdueDate = dueDateInput.val();
+const taskDescription = taskDescriptionInput.val();
+console.log(taskList);
+const newTask = {
+    title: taskTitle,
+    dueDate: taskdueDate,
+    description: taskDescription,
+    id: generateTaskId(),
+    status: "notStarted",
+}
+if (taskList==null) {taskList=[]}
+taskList.push(newTask);
+taskList = JSON.stringify(taskList);    
+localStorage.setItem('tasks', taskList);
 
- 
-  saveTaskstoStorage(task);
+taskTitleInput.val('')
+dueDateInput.val('')
+taskDescriptionInput.val('')
+console.log(newTask)
 
-  printProjectData();
+renderTaskList();
+}
 
 }
 
@@ -127,31 +136,37 @@ function handleDeleteTask(event) {
 
 // Todo: create a function to handle dropping a task into a new status lane
 function handleDrop(event, ui) {
-
- const tasks = readTasksFromStorage();
-
- const taskId = ui.draggable[0].dataset.taskId;
-
- const newStatus = event.target.id;
-
- for (let task of tasks) {
-   
-   if (task.id === taskId) {
-     task.status = newStatus;
-   }
- }
- // ? Save the updated projects array to localStorage (overwritting the previous one) and render the new project data to the screen.
- localStorage.setItem('tasks', JSON.stringify(tasks));
- printProjectData();
+    
+  const tasks = JSON.parse(localStorage.getItem('tasks'));    
+  let taskId = ui.draggable[0].dataset.taskid;
+  let dropStatus = $(this).attr('data-status')
+ 
+  console.log(dropStatus)
+  console.log(taskId)
+for (let task of tasks){
+ if (task.id == taskId) {
+     task.status = dropStatus;
+ }    
+}
+localStorage.setItem('tasks', JSON.stringify(tasks));
+renderTaskList();
 }
 
 // Todo: when the page loads, render the task list, add event listeners, make lanes droppable, and make the due date field a date picker
 $(document).ready(function () {
-
-  printProjectData();
-
-$('.lane').droppable({
-  accept: '.draggable',
-  drop: handleDrop,
+ renderTaskList();
+ $(function() {
+     $( "#dueDate" ).datepicker();
+ });
+ 
+ $(".taskForm").on('submit',handleAddTask);
+ $('.lane').droppable({
+     classes: {
+     "ui-droppable-active": "ui-state-highlight"
+     },
+     drop: handleDrop,
+ });
+ 
 });
-});
+
+$('.tripleList').on('click', '.deleteBtn', handleDeleteTask)
