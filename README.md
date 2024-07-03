@@ -43,3 +43,5 @@ This repository is under the MIT licesne.
 ```
 https://github.com/austintyrome/task-tracker
 ```
+
+![Screenshot 2024-07-02 at 6 45 15 PM](https://github.com/austintyrome/task-tracker/assets/161240648/b55418e4-2770-47ee-9535-09e623e22bba)
